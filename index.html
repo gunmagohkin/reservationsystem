@@ -218,17 +218,26 @@ document.getElementById('reservationForm').addEventListener('submit', async func
         dateReserved: document.getElementById('dateReserved').value
     };
 
-    const response = await fetch('https://script.google.com/macros/s/AKfycbxGKaXR-juKGkNF9vqPYlpoxZccinOBwI22MWrX8xCJiS72d3GroWDrdQWyk6P6RQhOKA/exec', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    });
+    try {
+        const response = await fetch("YOUR_GAS_WEB_APP_URL_HERE", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        });
 
-    const result = await response.json();
-    alert(result.message);
+        const result = await response.json();
+        alert(result.message);
+
+        if (result.success) {
+            document.getElementById("successModal").style.display = "flex";
+            document.getElementById("reservationForm").reset();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Reservation failed. Please try again.");
+    }
 });
+
 
 
     // Modal close handler
@@ -252,21 +261,32 @@ document.getElementById('reservationForm').addEventListener('submit', async func
 
 async function fetchAvailableDates() {
   try {
-    const response = await fetch("https://script.google.com/macros/s/AKfycbxGKaXR-juKGkNF9vqPYlpoxZccinOBwI22MWrX8xCJiS72d3GroWDrdQWyk6P6RQhOKA/exec"); // Palitan ng iyong actual web app URL
+    const response = await fetch("YOUR_GAS_WEB_APP_URL_HERE"); // Palitan ng iyong Web App URL
     const data = await response.json();
 
     if (!data.success || !Array.isArray(data.dates)) {
       throw new Error("Invalid response format");
     }
 
-    const dates = data.dates.map(date => new Date(date)); // Convert sa Date objects kung kinakailangan
-    console.log("Available Dates:", dates);
-    return dates;
+    const dateDropdown = document.getElementById("dateReserved");
+    dateDropdown.innerHTML = ""; // Clear previous options
+
+    data.dates.forEach(date => {
+      const option = document.createElement("option");
+      option.value = date;
+      option.textContent = formatDisplayDate(date);
+      dateDropdown.appendChild(option);
+    });
+
+    console.log("Available Dates:", data.dates);
   } catch (error) {
     console.error("Error fetching dates:", error);
-    return [];
   }
 }
+
+// Call fetchAvailableDates on page load
+window.onload = fetchAvailableDates;
+
 
     // Date selection change handler
     document.getElementById("dateReserved").addEventListener("change", function(e) {
