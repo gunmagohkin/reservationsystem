@@ -295,7 +295,10 @@ window.onload = fetchAvailableDates;
     });
 
     // Initialize on page load
-    window.onload = fetchAvailableDates;
+ window.onload = () => {
+  fetchAvailableDates();
+};
+
   </script>
 </body>
 </html>
