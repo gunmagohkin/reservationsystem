@@ -250,25 +250,22 @@ document.getElementById('reservationForm').addEventListener('submit', async func
       });
     }
 
-    // Fetch and populate available dates
-    async function fetchAvailableDates() {
-    try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbxGKaXR-juKGkNF9vqPYlpoxZccinOBwI22MWrX8xCJiS72d3GroWDrdQWyk6P6RQhOKA/exec');
-        const dates = await response.json();
+async function fetchAvailableDates() {
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbxGKaXR-juKGkNF9vqPYlpoxZccinOBwI22MWrX8xCJiS72d3GroWDrdQWyk6P6RQhOKA/exec"); // Palitan ng iyong actual web app URL
+    const data = await response.json();
 
-        const dateSelect = document.getElementById("dateReserved");
-        const displayDiv = document.getElementById("selectedDateDisplay");
-
-        dateSelect.innerHTML = dates.map(date =>
-            `<option value="${date}">${formatDisplayDate(date)}</option>`
-        ).join("");
-
-        if (dates.length > 0) {
-            displayDiv.textContent = formatDisplayDate(dates[0]);
-        }
-    } catch (error) {
-        console.error("Error fetching dates:", error);
+    if (!data.success || !Array.isArray(data.dates)) {
+      throw new Error("Invalid response format");
     }
+
+    const dates = data.dates.map(date => new Date(date)); // Convert sa Date objects kung kinakailangan
+    console.log("Available Dates:", dates);
+    return dates;
+  } catch (error) {
+    console.error("Error fetching dates:", error);
+    return [];
+  }
 }
 
     // Date selection change handler
