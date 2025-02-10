@@ -251,22 +251,25 @@ document.getElementById('reservationForm').addEventListener('submit', async func
     }
 
     // Fetch and populate available dates
-    function fetchAvailableDates() {
-      google.script.run
-        .withSuccessHandler(function(dates) {
-          const dateSelect = document.getElementById("dateReserved");
-          const displayDiv = document.getElementById("selectedDateDisplay");
-          
-          dateSelect.innerHTML = dates.map(date => 
-            `<option value="${date}">${formatDisplayDate(date)}</option>`
-          ).join("");
+    async function fetchAvailableDates() {
+    try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxGKaXR-juKGkNF9vqPYlpoxZccinOBwI22MWrX8xCJiS72d3GroWDrdQWyk6P6RQhOKA/exec');
+        const dates = await response.json();
 
-          if (dates.length > 0) {
+        const dateSelect = document.getElementById("dateReserved");
+        const displayDiv = document.getElementById("selectedDateDisplay");
+
+        dateSelect.innerHTML = dates.map(date =>
+            `<option value="${date}">${formatDisplayDate(date)}</option>`
+        ).join("");
+
+        if (dates.length > 0) {
             displayDiv.textContent = formatDisplayDate(dates[0]);
-          }
-        })
-        .getAvailableDates();
+        }
+    } catch (error) {
+        console.error("Error fetching dates:", error);
     }
+}
 
     // Date selection change handler
     document.getElementById("dateReserved").addEventListener("change", function(e) {
